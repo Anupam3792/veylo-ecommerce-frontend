@@ -6,8 +6,6 @@ import {
   Headphones,
   Mail,
   ArrowRight,
-  Instagram,
-  Github,
 } from 'lucide-react';
 
 export default function Footer() {
@@ -84,22 +82,7 @@ export default function Footer() {
             </p>
 
             <div className="flex justify-center lg:justify-start gap-2 mt-4">
-
-              <a
-                href="#"
-                aria-label="GitHub"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-paper/10 flex items-center justify-center text-paper/45 hover:text-verdant-light hover:border-verdant/40 transition-all"
-              >
-                <Github size={15} />
-              </a>
-
-              <a
-                href="#"
-                aria-label="Instagram"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-paper/10 flex items-center justify-center text-paper/45 hover:text-verdant-light hover:border-verdant/40 transition-all"
-              >
-                <Instagram size={15} />
-              </a>
+          
 
             </div>
           </div>
