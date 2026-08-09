@@ -209,7 +209,7 @@ export default function Catalog() {
     <div>
       {/* Dynamic header banner */}
 {/* Dynamic hero banner */}
-      <div className="relative bg-ink text-paper overflow-hidden min-h-[380px] sm:min-h-[440px] flex items-center">
+      <div className="relative bg-ink text-paper overflow-hidden min-h-[220px] sm:min-h-[440px] flex items-center">
         <motion.div
           aria-hidden="true"
           className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-verdant/10 blur-3xl pointer-events-none"
@@ -234,7 +234,7 @@ export default function Catalog() {
           )}
         </AnimatePresence>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative w-full py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative w-full py-8 sm:py-16">
           <AnimatePresence mode="wait">
             <motion.div
               key={searchQuery || selectedCategory || 'all'}
