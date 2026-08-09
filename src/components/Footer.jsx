@@ -7,7 +7,6 @@ import {
   Mail,
   ArrowRight,
   Instagram,
-  Twitter,
   Github,
 } from 'lucide-react';
 
@@ -92,14 +91,6 @@ export default function Footer() {
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-paper/10 flex items-center justify-center text-paper/45 hover:text-verdant-light hover:border-verdant/40 transition-all"
               >
                 <Github size={15} />
-              </a>
-
-              <a
-                href="#"
-                aria-label="Twitter"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-paper/10 flex items-center justify-center text-paper/45 hover:text-verdant-light hover:border-verdant/40 transition-all"
-              >
-                <Twitter size={15} />
               </a>
 
               <a
