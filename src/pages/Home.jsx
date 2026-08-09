@@ -18,9 +18,6 @@ const TESTIMONIALS = [
   { name: 'Ananya K.', role: 'Verified buyer', quote: 'Clean site, easy returns, and support actually responded fast when I had a question.', rating: 4 },
 ];
 
-// Editorial hero panels — bold type + gradient + a rotating emblem, not
-// stock photography, so nothing here depends on marketing assets you don't
-// have yet. Each slide gets its own icon/theme for visual variety.
 const HERO_SLIDES = [
   {
     id: 'new-arrivals',
@@ -119,8 +116,6 @@ function useCountdown(targetMs) {
 
 const HERO_AUTOPLAY_MS = 5000;
 
-// Word-by-word headline reveal — each word is masked inside an
-// overflow-hidden span and slides up into view with a stagger.
 const headlineContainerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.07, delayChildren: 0.3 } },
@@ -154,7 +149,7 @@ function HeroCarousel() {
     <section
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="relative h-[560px] sm:h-[640px] overflow-hidden"
+      className="relative h-[480px] sm:h-[640px] overflow-hidden"
     >
       <AnimatePresence mode="wait">
         <motion.div
@@ -165,7 +160,6 @@ function HeroCarousel() {
           transition={{ duration: 0.85, ease: [0.83, 0, 0.17, 1] }}
           className={`absolute inset-0 bg-gradient-to-br ${slide.theme}`}
         >
-          {/* Slow continuous zoom on the background layer, independent of the wipe */}
           <motion.div
             initial={{ scale: 1.08 }}
             animate={{ scale: 1 }}
@@ -190,12 +184,11 @@ function HeroCarousel() {
               className="absolute -left-32 top-1/3 w-72 h-72 rounded-full bg-paper/5 blur-3xl"
             />
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.4 }}
-            className="absolute top-6 right-6 sm:top-8 sm:right-8 z-10 font-mono text-xs text-paper/50 tracking-widest"
+            className="absolute top-5 right-5 sm:top-8 sm:right-8 z-10 font-mono text-[10px] sm:text-xs text-paper/50 tracking-widest"
           >
             {String(index + 1).padStart(2, '0')} / {String(HERO_SLIDES.length).padStart(2, '0')}
           </motion.div>
@@ -207,7 +200,7 @@ function HeroCarousel() {
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center gap-3 mb-5"
+                  className="flex items-center gap-3 mb-3 sm:mb-5"
                 >
                   <motion.span
                     initial={{ width: 0 }}
@@ -215,14 +208,14 @@ function HeroCarousel() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="h-px bg-paper/50"
                   />
-                  <p className="font-mono text-xs uppercase tracking-[0.25em] text-paper/70">{slide.eyebrow}</p>
+                  <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-paper/70">{slide.eyebrow}</p>
                 </motion.div>
 
                 <motion.h1
                   variants={headlineContainerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="font-display text-4xl sm:text-6xl md:text-6xl leading-[1.05] max-w-lg text-paper"
+                  className="font-display text-3xl sm:text-6xl md:text-6xl leading-[1.1] sm:leading-[1.05] max-w-lg text-paper"
                 >
                   {slide.title.split(' ').map((word, wi) => (
                     <span key={wi} className="inline-block overflow-hidden pb-1 mr-[0.28em] align-top">
@@ -237,7 +230,7 @@ function HeroCarousel() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-6 text-lg text-paper/70 max-w-md"
+                  className="mt-3 sm:mt-6 text-sm sm:text-lg text-paper/70 max-w-[85%] sm:max-w-md"
                 >
                   {slide.subtitle}
                 </motion.p>
@@ -251,7 +244,7 @@ function HeroCarousel() {
                     to={slide.to}
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
-                    className="group relative inline-block mt-8 px-8 py-3 bg-paper text-ink rounded-full text-sm font-sans uppercase tracking-widest w-fit overflow-hidden"
+                    className="group relative inline-block mt-5 sm:mt-8 px-6 sm:px-8 py-2.5 sm:py-3 bg-paper text-ink rounded-full text-xs sm:text-sm font-sans uppercase tracking-widest w-fit overflow-hidden"
                   >
                     <span className="relative z-10">{slide.cta}</span>
                     <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-ink/10 to-transparent" />
@@ -262,7 +255,7 @@ function HeroCarousel() {
                   initial="hidden"
                   animate="visible"
                   variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.9 } } }}
-                  className="flex flex-wrap items-center gap-2 mt-8"
+                  className="hidden sm:flex flex-wrap items-center gap-2 mt-8"
                 >
                   <motion.span
                     variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
@@ -315,22 +308,23 @@ function HeroCarousel() {
         </motion.div>
       </AnimatePresence>
 
+      {/* Arrows hidden on mobile — they overlapped the subtitle text on narrow screens. The progress dots below already let users jump between slides. */}
       <button
         onClick={prev}
         aria-label="Previous slide"
-        className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-paper/15 hover:bg-paper/25 backdrop-blur-sm flex items-center justify-center text-paper transition-colors"
+        className="hidden sm:flex absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-paper/15 hover:bg-paper/25 backdrop-blur-sm items-center justify-center text-paper transition-colors"
       >
         <ChevronLeft size={18} strokeWidth={2} />
       </button>
       <button
         onClick={next}
         aria-label="Next slide"
-        className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-paper/15 hover:bg-paper/25 backdrop-blur-sm flex items-center justify-center text-paper transition-colors"
+        className="hidden sm:flex absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-paper/15 hover:bg-paper/25 backdrop-blur-sm items-center justify-center text-paper transition-colors"
       >
         <ChevronRight size={18} strokeWidth={2} />
       </button>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 w-full max-w-md px-6">
+      <div className="absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 w-full max-w-md px-6">
         {HERO_SLIDES.map((s, i) => (
           <button
             key={s.id}
@@ -395,7 +389,7 @@ function SkeletonCircles({ count = 6 }) {
 
 function SectionSkeleton({ tiles = false, count = 4 }) {
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
       <div className="h-7 w-48 bg-stone rounded-full animate-pulse mb-8" />
       {tiles ? <SkeletonTiles count={count} /> : <SkeletonRow count={count} />}
     </section>
@@ -407,9 +401,8 @@ function CircularQuickLinks({ categories }) {
 
   return (
     <ScrollReveal>
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <div className="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 sm:mx-0 sm:px-0"></div>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-14">
+        <div className="flex gap-4 sm:gap-8 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
           {categories.map((cat, i) => (
             <motion.div
               key={cat.name}
@@ -495,23 +488,23 @@ function CountUp({ target, suffix = '', duration = 1.4 }) {
 function StatsStrip({ stats }) {
   return (
     <ScrollReveal>
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-center">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-8 text-center">
           <div>
-            <p className="font-display text-3xl sm:text-4xl text-verdant"><CountUp target={stats.products} suffix="+" /></p>
-            <p className="text-xs uppercase tracking-widest text-ink/40 mt-2">Products in stock</p>
+            <p className="font-display text-2xl sm:text-4xl text-verdant"><CountUp target={stats.products} suffix="+" /></p>
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-ink/40 mt-1.5 sm:mt-2">Products in stock</p>
           </div>
           <div>
-            <p className="font-display text-3xl sm:text-4xl text-verdant"><CountUp target={stats.categories} /></p>
-            <p className="text-xs uppercase tracking-widest text-ink/40 mt-2">Categories</p>
+            <p className="font-display text-2xl sm:text-4xl text-verdant"><CountUp target={stats.categories} /></p>
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-ink/40 mt-1.5 sm:mt-2">Categories</p>
           </div>
           <div>
-            <p className="font-display text-3xl sm:text-4xl text-verdant"><CountUp target={stats.brands} /></p>
-            <p className="text-xs uppercase tracking-widest text-ink/40 mt-2">Brands</p>
+            <p className="font-display text-2xl sm:text-4xl text-verdant"><CountUp target={stats.brands} /></p>
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-ink/40 mt-1.5 sm:mt-2">Brands</p>
           </div>
           <div>
-            <p className="font-display text-3xl sm:text-4xl text-verdant">{stats.avgRating > 0 ? stats.avgRating.toFixed(1) : '—'}★</p>
-            <p className="text-xs uppercase tracking-widest text-ink/40 mt-2">Avg. rating</p>
+            <p className="font-display text-2xl sm:text-4xl text-verdant">{stats.avgRating > 0 ? stats.avgRating.toFixed(1) : '—'}★</p>
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-ink/40 mt-1.5 sm:mt-2">Avg. rating</p>
           </div>
         </div>
       </section>
@@ -523,20 +516,20 @@ function ProductRow({ title, subtitle, products, viewAllTo = '/catalog', rightSl
   if (products.length === 0) return null;
   return (
     <ScrollReveal>
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
+        <div className="flex items-end justify-between mb-5 sm:mb-8 gap-4 flex-wrap">
           <div>
-            <h2 className="font-display text-2xl sm:text-3xl">{title}</h2>
-            {subtitle && <p className="text-sm text-ink/50 mt-1.5">{subtitle}</p>}
+            <h2 className="font-display text-xl sm:text-3xl">{title}</h2>
+            {subtitle && <p className="text-xs sm:text-sm text-ink/50 mt-1 sm:mt-1.5">{subtitle}</p>}
           </div>
           <div className="flex items-center gap-4">
             {rightSlot}
-            <Link to={viewAllTo} className="text-xs uppercase tracking-widest text-verdant hover:text-verdant-light transition-colors whitespace-nowrap">
+            <Link to={viewAllTo} className="text-[10px] sm:text-xs uppercase tracking-widest text-verdant hover:text-verdant-light transition-colors whitespace-nowrap">
               View all
             </Link>
           </div>
         </div>
-        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
+        <div className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
           {products.map((product, i) => (
             <motion.div
               key={product.id}
@@ -544,7 +537,7 @@ function ProductRow({ title, subtitle, products, viewAllTo = '/catalog', rightSl
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
-              className="w-44 sm:w-56 flex-shrink-0 snap-start"
+              className="w-36 sm:w-56 flex-shrink-0 snap-start"
             >
               <ProductCard product={product} />
             </motion.div>
@@ -578,10 +571,10 @@ function BrandMarquee({ brands }) {
           <Link
             key={`${brand}-${i}`}
             to={`/catalog?brand=${encodeURIComponent(brand)}`}
-            className="group flex flex-col items-center justify-center gap-3 w-32 h-32 flex-shrink-0 rounded-2xl border border-stone bg-white/50 hover:border-verdant hover:shadow-lg transition-all duration-300"
+            className="group flex flex-col items-center justify-center gap-2 sm:gap-3 w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-2xl border border-stone bg-white/50 hover:border-verdant hover:shadow-lg transition-all duration-300"
           >
-            <span className="font-display text-2xl italic text-ink/70 group-hover:text-verdant transition-colors">{brand.charAt(0)}</span>
-            <span className="text-xs text-ink/60 group-hover:text-ink transition-colors text-center px-2 truncate w-full">{brand}</span>
+            <span className="font-display text-lg sm:text-2xl italic text-ink/70 group-hover:text-verdant transition-colors">{brand.charAt(0)}</span>
+            <span className="text-[10px] sm:text-xs text-ink/60 group-hover:text-ink transition-colors text-center px-2 truncate w-full">{brand}</span>
           </Link>
         ))}
       </div>
@@ -611,24 +604,24 @@ function NewsletterSection() {
             animate={{ scale: [1, 1.15, 1] }}
             transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <div className="relative p-8 sm:p-14 text-center max-w-xl mx-auto">
-            <span className="font-mono text-xs uppercase tracking-widest text-verdant-light">Stay in the loop</span>
-            <h2 className="font-display text-3xl sm:text-4xl mt-3">Get first access to new drops.</h2>
-            <p className="text-paper/60 mt-3 text-sm">Restocks, price drops, and offers — straight to your inbox, no spam.</p>
-            <form onSubmit={handleSubmit} className="mt-6 flex flex-col sm:flex-row items-center gap-3 justify-center">
+          <div className="relative p-6 sm:p-14 text-center max-w-xl mx-auto">
+            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-verdant-light">Stay in the loop</span>
+            <h2 className="font-display text-2xl sm:text-4xl mt-2 sm:mt-3">Get first access to new drops.</h2>
+            <p className="text-paper/60 mt-2 sm:mt-3 text-xs sm:text-sm">Restocks, price drops, and offers — straight to your inbox, no spam.</p>
+            <form onSubmit={handleSubmit} className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center gap-3 justify-center">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full sm:w-72 px-5 py-3 rounded-full bg-paper/10 border border-paper/20 placeholder:text-paper/40 text-paper text-sm focus:outline-none focus:border-verdant-light transition-colors"
+                className="w-full sm:w-72 px-5 py-2.5 sm:py-3 rounded-full bg-paper/10 border border-paper/20 placeholder:text-paper/40 text-paper text-sm focus:outline-none focus:border-verdant-light transition-colors"
               />
               <motion.button
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
                 type="submit"
-                className="px-7 py-3 bg-verdant hover:bg-verdant-light transition-colors rounded-full text-sm font-sans uppercase tracking-widest text-paper whitespace-nowrap w-full sm:w-auto"
+                className="px-7 py-2.5 sm:py-3 bg-verdant hover:bg-verdant-light transition-colors rounded-full text-sm font-sans uppercase tracking-widest text-paper whitespace-nowrap w-full sm:w-auto"
               >
                 {submitted ? 'Subscribed ✓' : 'Subscribe'}
               </motion.button>
@@ -739,7 +732,7 @@ export default function Home() {
       <HeroCarousel />
 
       {loading ? (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-14">
           <SkeletonCircles />
         </section>
       ) : (
@@ -752,11 +745,11 @@ export default function Home() {
         <SectionSkeleton tiles count={4} />
       ) : categories.length > 0 && (
         <ScrollReveal>
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 relative">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="font-display text-2xl sm:text-3xl">Shop by category</h2>
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 relative">
+            <div className="flex items-center justify-between mb-5 sm:mb-8">
+              <h2 className="font-display text-xl sm:text-3xl">Shop by category</h2>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
               {categories.map((cat, i) => (
                 <motion.div
                   key={cat.name}
@@ -783,9 +776,9 @@ export default function Home() {
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                        <p className="font-display text-paper text-base sm:text-lg leading-tight">{cat.name}</p>
-                        <p className="text-paper/60 text-xs font-mono mt-0.5">{cat.count} item{cat.count !== 1 ? 's' : ''}</p>
+                      <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-4">
+                        <p className="font-display text-paper text-sm sm:text-lg leading-tight">{cat.name}</p>
+                        <p className="text-paper/60 text-[10px] sm:text-xs font-mono mt-0.5">{cat.count} item{cat.count !== 1 ? 's' : ''}</p>
                       </div>
                     </motion.div>
                   </Link>
@@ -798,10 +791,10 @@ export default function Home() {
 
       {!loading && priceBuckets.length > 0 && (
         <ScrollReveal>
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-            <h2 className="font-display text-2xl sm:text-3xl mb-8">Shop by price</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
-      {priceBuckets.map((b, i) => (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
+            <h2 className="font-display text-xl sm:text-3xl mb-5 sm:mb-8">Shop by price</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
+              {priceBuckets.map((b, i) => (
                 <motion.div
                   key={b.label}
                   initial={{ opacity: 0, y: 16 }}
@@ -829,14 +822,13 @@ export default function Home() {
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center gap-1.5 p-2">
-                        <span className="font-display text-lg sm:text-xl text-paper px-2">{b.label}</span>
-                        <span className="text-xs font-mono text-paper/70">{b.count} item{b.count !== 1 ? 's' : ''}</span>
+                        <span className="font-display text-sm sm:text-xl text-paper px-2">{b.label}</span>
+                        <span className="text-[10px] sm:text-xs font-mono text-paper/70">{b.count} item{b.count !== 1 ? 's' : ''}</span>
                       </div>
                     </motion.div>
                   </Link>
                 </motion.div>
               ))}
-              
             </div>
           </section>
         </ScrollReveal>
@@ -860,9 +852,9 @@ export default function Home() {
           subtitle="Our biggest discounts, while stock lasts"
           products={limitedOffers}
           rightSlot={
-            <span className="flex items-center gap-1.5 font-mono text-xs text-ember bg-ember/10 px-3 py-1.5 rounded-full">
-              <Clock size={13} strokeWidth={1.75} />
-              Ends in {countdown.hours}:{countdown.minutes}:{countdown.seconds}
+            <span className="flex items-center gap-1.5 font-mono text-[10px] sm:text-xs text-ember bg-ember/10 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full">
+              <Clock size={12} strokeWidth={1.75} />
+              {countdown.hours}:{countdown.minutes}:{countdown.seconds}
             </span>
           }
         />
@@ -877,24 +869,24 @@ export default function Home() {
               animate={{ scale: [1, 1.15, 1] }}
               transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             />
-            <div className="relative grid sm:grid-cols-2 gap-6 p-8 sm:p-12 items-center">
+            <div className="relative grid sm:grid-cols-2 gap-5 sm:gap-6 p-6 sm:p-12 items-center">
               <div>
-                <span className="font-mono text-xs uppercase tracking-widest text-verdant-light">First order?</span>
-                <h2 className="font-display text-3xl sm:text-4xl mt-2">Get 10% off, on us.</h2>
-                <p className="text-paper/60 mt-3 text-sm max-w-sm">
+                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-verdant-light">First order?</span>
+                <h2 className="font-display text-2xl sm:text-4xl mt-2">Get 10% off, on us.</h2>
+                <p className="text-paper/60 mt-2 sm:mt-3 text-xs sm:text-sm max-w-sm">
                   Use the code at checkout — applied instantly, no minimum order.
                 </p>
-                <div className="flex items-center gap-3 mt-6">
-                  <div className="flex items-center gap-3 border border-paper/20 rounded-full pl-5 pr-2 py-2">
-                    <span className="font-mono text-lg tracking-widest">WELCOME10</span>
+                <div className="flex items-center gap-3 mt-4 sm:mt-6">
+                  <div className="flex items-center gap-3 border border-paper/20 rounded-full pl-4 sm:pl-5 pr-2 py-1.5 sm:py-2">
+                    <span className="font-mono text-sm sm:text-lg tracking-widest">WELCOME10</span>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleCopyCode}
-                      className="w-9 h-9 rounded-full bg-verdant hover:bg-verdant-light transition-colors flex items-center justify-center flex-shrink-0"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-verdant hover:bg-verdant-light transition-colors flex items-center justify-center flex-shrink-0"
                       aria-label="Copy promo code"
                     >
-                      {copied ? <Check size={15} strokeWidth={2.5} /> : <Copy size={14} strokeWidth={1.75} />}
+                      {copied ? <Check size={14} strokeWidth={2.5} /> : <Copy size={13} strokeWidth={1.75} />}
                     </motion.button>
                   </div>
                 </div>
@@ -903,7 +895,7 @@ export default function Home() {
                 to="/catalog"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="sm:justify-self-end inline-block px-8 py-3 bg-paper text-ink rounded-full text-sm font-sans uppercase tracking-widest w-fit"
+                className="sm:justify-self-end inline-block px-6 sm:px-8 py-2.5 sm:py-3 bg-paper text-ink rounded-full text-xs sm:text-sm font-sans uppercase tracking-widest w-fit"
               >
                 Start shopping
               </MotionLink>
@@ -914,16 +906,16 @@ export default function Home() {
 
       {!loading && collections.length > 0 && (
         <ScrollReveal>
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-            <h2 className="font-display text-2xl sm:text-3xl mb-10">Featured collections</h2>
-            <div className="space-y-12">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
+            <h2 className="font-display text-xl sm:text-3xl mb-6 sm:mb-10">Featured collections</h2>
+            <div className="space-y-8 sm:space-y-12">
               {collections.map((c) => (
                 <div key={c.id}>
-                  <div className="flex items-baseline justify-between mb-5 gap-4 flex-wrap">
-                    <h3 className="font-display text-xl">{c.title}</h3>
-                    <p className="text-xs text-ink/40">{c.subtitle}</p>
+                  <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-4 flex-wrap">
+                    <h3 className="font-display text-lg sm:text-xl">{c.title}</h3>
+                    <p className="text-[10px] sm:text-xs text-ink/40">{c.subtitle}</p>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10">
                     {c.products.map((product, i) => (
                       <ScrollReveal key={product.id} direction="up" delay={i * 0.05}>
                         <ProductCard product={product} />
@@ -939,8 +931,8 @@ export default function Home() {
 
       {!loading && brands.length >= 3 && (
         <ScrollReveal>
-          <section className="max-w-7xl mx-auto py-12 sm:py-16 relative">
-            <h2 className="font-display text-2xl sm:text-3xl mb-8 max-w-7xl mx-auto px-4 sm:px-6">Featured brands</h2>
+          <section className="max-w-7xl mx-auto py-8 sm:py-16 relative">
+            <h2 className="font-display text-xl sm:text-3xl mb-5 sm:mb-8 max-w-7xl mx-auto px-4 sm:px-6">Featured brands</h2>
             <BrandMarquee brands={brands} />
           </section>
         </ScrollReveal>
@@ -950,21 +942,20 @@ export default function Home() {
         <ProductRow title="Recently viewed" subtitle="Pick up where you left off" products={recentlyViewed} />
       )}
 
-      {/* Why shop with Veylo — no image blocks, just the two messages side by side */}
       <ScrollReveal>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
-          <div className="grid sm:grid-cols-2 gap-10 sm:gap-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-20">
+          <div className="grid sm:grid-cols-2 gap-8 sm:gap-16">
             <ScrollReveal direction="left">
-              <span className="font-mono text-xs uppercase tracking-widest text-ember">Live inventory</span>
-              <h2 className="font-display text-3xl sm:text-4xl mt-3">Stock levels, straight from the source.</h2>
-              <p className="mt-4 text-ink/60">
+              <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-ember">Live inventory</span>
+              <h2 className="font-display text-2xl sm:text-4xl mt-2 sm:mt-3">Stock levels, straight from the source.</h2>
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base text-ink/60">
                 No more ordering something that's already sold out. Every listing reflects real, current stock.
               </p>
             </ScrollReveal>
             <ScrollReveal direction="right" delay={0.1}>
-              <span className="font-mono text-xs uppercase tracking-widest text-verdant">Fast checkout</span>
-              <h2 className="font-display text-3xl sm:text-4xl mt-3">From cart to confirmed in seconds.</h2>
-              <p className="mt-4 text-ink/60">
+              <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-verdant">Fast checkout</span>
+              <h2 className="font-display text-2xl sm:text-4xl mt-2 sm:mt-3">From cart to confirmed in seconds.</h2>
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base text-ink/60">
                 A streamlined checkout built for speed, with real-time totals as you shop.
               </p>
             </ScrollReveal>
@@ -973,9 +964,9 @@ export default function Home() {
       </ScrollReveal>
 
       <ScrollReveal>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 relative">
-          <h2 className="font-display text-2xl sm:text-3xl mb-8">What customers are saying</h2>
-          <div className="grid sm:grid-cols-3 gap-6">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 relative">
+          <h2 className="font-display text-xl sm:text-3xl mb-5 sm:mb-8">What customers are saying</h2>
+          <div className="grid sm:grid-cols-3 gap-4 sm:gap-6">
             {TESTIMONIALS.map((t, i) => (
               <motion.div
                 key={t.name}
@@ -983,7 +974,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="bg-white/60 border border-stone rounded-2xl p-6"
+                className="bg-white/60 border border-stone rounded-2xl p-5 sm:p-6"
               >
                 <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: 5 }).map((_, s) => (
@@ -1001,22 +992,22 @@ export default function Home() {
 
       <ScrollReveal>
         <section className="border-y border-stone bg-white/40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <ShieldCheck size={20} strokeWidth={1.5} className="text-verdant" />
-              <span className="text-xs text-ink/60">Secured by Razorpay</span>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 text-center">
+            <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+              <ShieldCheck size={18} strokeWidth={1.5} className="text-verdant" />
+              <span className="text-[10px] sm:text-xs text-ink/60">Secured by Razorpay</span>
             </div>
-            <div className="flex flex-col items-center gap-2">
-              <RotateCcw size={20} strokeWidth={1.5} className="text-verdant" />
-              <span className="text-xs text-ink/60">7-day returns</span>
+            <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+              <RotateCcw size={18} strokeWidth={1.5} className="text-verdant" />
+              <span className="text-[10px] sm:text-xs text-ink/60">7-day returns</span>
             </div>
-            <div className="flex flex-col items-center gap-2">
-              <Truck size={20} strokeWidth={1.5} className="text-verdant" />
-              <span className="text-xs text-ink/60">Pan-India delivery</span>
+            <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+              <Truck size={18} strokeWidth={1.5} className="text-verdant" />
+              <span className="text-[10px] sm:text-xs text-ink/60">Pan-India delivery</span>
             </div>
-            <div className="flex flex-col items-center gap-2">
-              <PackageCheck size={20} strokeWidth={1.5} className="text-verdant" />
-              <span className="text-xs text-ink/60">Real-time stock</span>
+            <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+              <PackageCheck size={18} strokeWidth={1.5} className="text-verdant" />
+              <span className="text-[10px] sm:text-xs text-ink/60">Real-time stock</span>
             </div>
           </div>
         </section>
@@ -1025,14 +1016,14 @@ export default function Home() {
       <NewsletterSection />
 
       <ScrollReveal direction="zoom">
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-24 text-center relative">
-          <h2 className="font-display text-4xl sm:text-5xl">Ready to see what's on the shelf?</h2>
-          <p className="mt-4 text-ink/60">Browse the full catalog below.</p>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-24 text-center relative">
+          <h2 className="font-display text-3xl sm:text-5xl">Ready to see what's on the shelf?</h2>
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base text-ink/60">Browse the full catalog below.</p>
           <MotionLink
             to="/catalog"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            className="inline-block mt-8 px-8 py-3 bg-verdant hover:bg-verdant-light transition-colors rounded-full text-sm font-sans uppercase tracking-widest text-paper"
+            className="inline-block mt-6 sm:mt-8 px-7 sm:px-8 py-2.5 sm:py-3 bg-verdant hover:bg-verdant-light transition-colors rounded-full text-xs sm:text-sm font-sans uppercase tracking-widest text-paper"
           >
             Shop the catalog
           </MotionLink>
