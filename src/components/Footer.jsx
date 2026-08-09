@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Github, Instagram, Twitter, ShieldCheck, Truck, CreditCard } from 'lucide-react';
+import { Github, Instagram, ShieldCheck, Truck, CreditCard } from 'lucide-react';
 
 export default function Footer() {
   return (
