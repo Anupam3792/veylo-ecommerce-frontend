@@ -40,7 +40,15 @@ export default function AdminAnalytics() {
     }).finally(() => setLoading(false));
   }, []);
 
-  const revenue = useMemo(() => orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0), [orders]);
+  const revenue = useMemo(
+  () =>
+    orders.reduce(
+      (sum, order) =>
+        sum + Number(order.totalAmount || 0),
+      0
+    ),
+  [orders]
+);
 
   const revenueByDay = useMemo(() => {
     const map = {};
@@ -64,7 +72,7 @@ export default function AdminAnalytics() {
   const topProducts = useMemo(() => {
     const map = {};
     orders.forEach((o) => {
-      o.items.forEach((item) => {
+      (o.items || []).forEach((item) => {
         map[item.productName] = (map[item.productName] || 0) + item.quantity;
       });
     });
@@ -79,7 +87,7 @@ export default function AdminAnalytics() {
     products.forEach((p) => { productMap[p.name] = p.category; });
     const map = {};
     orders.forEach((o) => {
-      o.items.forEach((item) => {
+      (o.items || []).forEach((item) => {
         const category = productMap[item.productName] || 'Other';
         map[category] = (map[category] || 0) + item.price * item.quantity;
       });
