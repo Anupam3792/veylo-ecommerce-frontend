@@ -15,80 +15,315 @@ const statusColor = {
 
 export default function Orders() {
   const { user, loading: authLoading } = useAuth();
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (authLoading) return;
+
     if (!user) {
       setLoading(false);
       return;
     }
-    api.get(`/api/orders/user/${user.id}`)
-      .then((res) => setOrders(res.data))
-      .catch(() => setError('Could not load your orders.'))
-      .finally(() => setLoading(false));
+
+    api
+      .get(`/api/orders/user/${user.id}`)
+      .then((res) => {
+        setOrders(res.data);
+      })
+      .catch(() => {
+        setError('Could not load your orders.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [user, authLoading]);
 
+  // User is not logged in
   if (!authLoading && !user) {
     return (
-      <div className="min-h-[calc(100vh-5rem)] flex items-center justify-center px-6 text-center">
-        <h1 className="font-display text-3xl">Sign in to see your orders</h1>
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="text-center">
+          <Package
+            size={32}
+            strokeWidth={1.5}
+            className="mx-auto text-ink/25"
+          />
+
+          <p className="mt-4 text-sm sm:text-base text-ink/50 font-mono">
+            Sign in to see your orders
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+
+      {/* Page Header */}
       <ScrollReveal>
-        <h1 className="font-display text-5xl">Order history</h1>
+        <div className="mb-7 sm:mb-10">
+
+          <p className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-verdant mb-2">
+            Your purchases
+          </p>
+
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl">
+            Order history
+          </h1>
+
+          <p className="mt-2 text-sm text-ink/50">
+            Track your orders and view your purchase details.
+          </p>
+
+        </div>
       </ScrollReveal>
 
-      {loading && <p className="mt-10 text-ink/40 font-mono text-sm">Loading orders...</p>}
-      {error && <p className="mt-10 text-ember font-mono text-sm">{error}</p>}
-      {!loading && !error && orders.length === 0 && (
-        <p className="mt-10 text-ink/40 font-mono text-sm">No orders yet.</p>
+      {/* Loading */}
+      {loading && (
+        <div className="mt-8 sm:mt-10">
+          <p className="text-ink/40 font-mono text-sm">
+            Loading orders...
+          </p>
+        </div>
       )}
 
-      <div className="mt-10 space-y-4">
-        {orders.map((order, i) => (
-          <motion.div
-            key={order.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: i * 0.05 }}
-            className="bg-white/60 border border-stone rounded-2xl p-6"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Package size={18} strokeWidth={1.75} className="text-ink/40" />
-                <span className="font-mono text-sm text-ink/50">Order #{order.id}</span>
-              </div>
-              <span className={`text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-full ${statusColor[order.status] || 'text-ink/50 bg-stone'}`}>
-                {order.status}
-              </span>
-              <div className="mt-5 mb-1 px-1">
-              <OrderTimeline status={order.status} />
-            </div>
-            </div>
+      {/* Error */}
+      {error && (
+        <div className="mt-8 rounded-xl border border-ember/20 bg-ember/5 px-4 py-3">
+          <p className="text-ember font-mono text-xs sm:text-sm">
+            {error}
+          </p>
+        </div>
+      )}
 
-            <div className="mt-4 space-y-2">
-              {order.items.map((item) => (
-                <div key={item.productId} className="flex justify-between text-sm text-ink/70">
-                  <span>{item.productName} × {item.quantity}</span>
-                  <span className="font-mono">₹{(item.price * item.quantity).toFixed(2)}</span>
+      {/* No Orders */}
+      {!loading && !error && orders.length === 0 && (
+        <div className="mt-8 sm:mt-10 rounded-2xl border border-stone bg-white/60 p-8 sm:p-12 text-center">
+
+          <Package
+            size={34}
+            strokeWidth={1.25}
+            className="mx-auto text-ink/20"
+          />
+
+          <p className="mt-4 font-display text-xl sm:text-2xl">
+            No orders yet
+          </p>
+
+          <p className="mt-1 text-sm text-ink/40">
+            Your orders will appear here after checkout.
+          </p>
+
+        </div>
+      )}
+
+      {/* Orders List */}
+      {!loading && !error && orders.length > 0 && (
+        <div className="mt-7 sm:mt-10 space-y-4 sm:space-y-6">
+
+          {orders.map((order, i) => (
+            <motion.div
+              key={order.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.4,
+                delay: i * 0.05,
+              }}
+              className="
+                bg-white/70
+                border border-stone
+                rounded-2xl
+                overflow-hidden
+              "
+            >
+
+              {/* =========================
+                  ORDER HEADER
+              ========================== */}
+              <div className="p-4 sm:p-6">
+
+                <div className="flex items-center justify-between gap-3">
+
+                  {/* Order Number */}
+                  <div className="flex items-center gap-2.5 min-w-0">
+
+                    <div className="
+                      w-9 h-9
+                      sm:w-10 sm:h-10
+                      rounded-full
+                      bg-stone
+                      flex items-center justify-center
+                      flex-shrink-0
+                    ">
+                      <Package
+                        size={17}
+                        strokeWidth={1.75}
+                        className="text-ink/45"
+                      />
+                    </div>
+
+                    <div className="min-w-0">
+
+                      <p className="
+                        font-mono
+                        text-[10px]
+                        sm:text-xs
+                        text-ink/40
+                        uppercase
+                        tracking-wider
+                      ">
+                        Order
+                      </p>
+
+                      <p className="
+                        font-mono
+                        text-sm
+                        sm:text-base
+                        text-ink/70
+                      ">
+                        #{order.id}
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                  {/* Status */}
+                  <span
+                    className={`
+                      flex-shrink-0
+                      text-[10px]
+                      sm:text-xs
+                      font-mono
+                      uppercase
+                      tracking-wider
+                      px-2.5
+                      sm:px-3
+                      py-1.5
+                      rounded-full
+                      ${
+                        statusColor[order.status] ||
+                        'text-ink/50 bg-stone'
+                      }
+                    `}
+                  >
+                    {order.status}
+                  </span>
+
                 </div>
-              ))}
-            </div>
 
-            <div className="mt-4 pt-4 border-t border-stone flex justify-between font-display text-lg">
-              <span>Total</span>
-              <span className="font-mono">₹{order.totalAmount.toFixed(2)}</span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+                {/* =========================
+                    ORDER TIMELINE
+                ========================== */}
+                <div className="mt-6 sm:mt-7 w-full">
+                  <OrderTimeline status={order.status} />
+                </div>
+
+              </div>
+
+              {/* =========================
+                  ORDER ITEMS
+              ========================== */}
+              <div className="
+                border-t
+                border-stone
+                px-4
+                sm:px-6
+                py-4
+                sm:py-5
+              ">
+
+                <div className="space-y-3">
+
+                  {order.items.map((item) => (
+                    <div
+                      key={item.productId}
+                      className="
+                        flex
+                        items-start
+                        justify-between
+                        gap-4
+                        text-xs
+                        sm:text-sm
+                        text-ink/70
+                      "
+                    >
+
+                      {/* Product name */}
+                      <span className="
+                        min-w-0
+                        leading-5
+                      ">
+                        {item.productName}
+
+                        <span className="text-ink/40">
+                          {' '}× {item.quantity}
+                        </span>
+                      </span>
+
+                      {/* Item price */}
+                      <span className="
+                        font-mono
+                        flex-shrink-0
+                        whitespace-nowrap
+                      ">
+                        ₹{(item.price * item.quantity).toFixed(2)}
+                      </span>
+
+                    </div>
+                  ))}
+
+                </div>
+
+              </div>
+
+              {/* =========================
+                  TOTAL
+              ========================== */}
+              <div className="
+                border-t
+                border-stone
+                px-4
+                sm:px-6
+                py-4
+                sm:py-5
+                flex
+                items-center
+                justify-between
+                gap-4
+              ">
+
+                <span className="
+                  font-display
+                  text-lg
+                  sm:text-xl
+                ">
+                  Total
+                </span>
+
+                <span className="
+                  font-mono
+                  text-base
+                  sm:text-lg
+                  font-medium
+                  whitespace-nowrap
+                ">
+                  ₹{Number(order.totalAmount).toFixed(2)}
+                </span>
+
+              </div>
+
+            </motion.div>
+          ))}
+
+        </div>
+      )}
+
     </div>
   );
 }
