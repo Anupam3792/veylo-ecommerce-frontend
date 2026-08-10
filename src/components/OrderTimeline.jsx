@@ -13,39 +13,36 @@ export default function OrderTimeline({ status }) {
   const activeIndex = currentIndex === -1 ? 0 : currentIndex;
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center w-full min-w-0">
       {STEPS.map((step, i) => {
         const isDone = i < activeIndex;
         const isActive = i === activeIndex;
-        const isUpcoming = i > activeIndex;
         const Icon = step.icon;
 
         return (
-          <div key={step.key} className="flex items-center flex-1 last:flex-none">
-            <div className="flex flex-col items-center">
+          <div key={step.key} className="flex items-center flex-1 last:flex-none min-w-0">
+            <div className="flex flex-col items-center min-w-0">
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3, delay: i * 0.08 }}
-                className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+                className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
                   isDone || isActive ? 'bg-verdant text-paper' : 'bg-stone text-ink/30'
                 }`}
               >
-                {isDone ? (
-                  <Check size={16} strokeWidth={2.5} />
-                ) : (
-                  <Icon size={15} strokeWidth={1.75} />
-                )}
+                {isDone ? <Check size={14} strokeWidth={2.5} /> : <Icon size={13} strokeWidth={1.75} />}
               </motion.div>
-              <span className={`text-[11px] font-mono mt-1.5 whitespace-nowrap ${
-                isActive ? 'text-verdant' : isDone ? 'text-ink/60' : 'text-ink/30'
-              }`}>
+              <span
+                className={`text-[9px] sm:text-[11px] font-mono mt-1 sm:mt-1.5 truncate max-w-[48px] sm:max-w-none text-center ${
+                  isActive ? 'text-verdant' : isDone ? 'text-ink/60' : 'text-ink/30'
+                }`}
+              >
                 {step.label}
               </span>
             </div>
 
             {i < STEPS.length - 1 && (
-              <div className="flex-1 h-0.5 mx-2 -mt-5 bg-stone relative overflow-hidden rounded-full">
+              <div className="flex-1 h-0.5 mx-1 sm:mx-2 -mt-4 sm:-mt-5 bg-stone relative overflow-hidden rounded-full min-w-[8px]">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: isDone ? '100%' : '0%' }}
