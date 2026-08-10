@@ -93,7 +93,30 @@ export default function Checkout() {
           contact: form.shippingPhone,
         },
         theme: { color: '#0f6e4f' },
-        
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: 'Pay via UPI',
+                instruments: [
+                  { method: 'upi' },
+                ],
+              },
+              other: {
+                name: 'Other payment methods',
+                instruments: [
+                  { method: 'card' },
+                  { method: 'netbanking' },
+                  { method: 'wallet' },
+                ],
+              },
+            },
+            sequence: ['block.upi', 'block.other'],
+            preferences: {
+              show_default_blocks: false,
+            },
+          },
+        },
         handler: async function (response) {
           try {
             await api.post('/api/payment/verify', {
@@ -219,8 +242,7 @@ export default function Checkout() {
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs uppercase tracking-widest text-ink/50 mb-2">Address</label>
-                <input
-                  type="text" name="shippingAddress" value={form.shippingAddress} onChange={handleChange} required
+                <input type="text" name="shippingAddress" value={form.shippingAddress} onChange={handleChange} required
                   className="w-full px-4 py-3 rounded-lg border border-stone bg-paper focus:outline-none focus:ring-2 focus:ring-verdant/40 focus:border-verdant transition-all"
                   placeholder="House no., street, area"
                 />
