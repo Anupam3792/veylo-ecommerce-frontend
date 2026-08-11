@@ -297,10 +297,10 @@ export default function Checkout() {
                   <div className="w-12 h-12 rounded-lg bg-stone overflow-hidden flex-shrink-0">
                     {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate">{item.name}</p>
-                    <p className="text-xs text-ink/40 font-mono">Qty {item.quantity}</p>
-                  </div>
+               <div className="flex-1 min-w-0 overflow-hidden">
+  <p className="text-sm truncate">{item.name}</p>
+  <p className="text-xs text-ink/40 font-mono">Qty {item.quantity}</p>
+</div>
                   <span className="font-mono text-sm flex-shrink-0">₹{(item.price * item.quantity).toFixed(2)}</span>
                 </motion.div>
               ))}
@@ -314,7 +314,7 @@ export default function Checkout() {
             className="flex items-center gap-3 bg-verdant/5 border border-verdant/15 rounded-2xl px-5 py-4"
           >
             <Truck size={18} strokeWidth={1.75} className="text-verdant flex-shrink-0" />
-            <p className="text-sm text-ink/70">Estimated delivery in <span className="font-mono">5–7 days</span>, tracked from dispatch.</p>
+            <p className="text-sm text-ink/70 min-w-0">Estimated delivery in <span className="font-mono">5–7 days</span>, tracked from dispatch.</p>
           </motion.div>
         </div>
 
