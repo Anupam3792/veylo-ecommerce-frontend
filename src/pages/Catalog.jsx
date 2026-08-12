@@ -7,6 +7,7 @@ import ProductCard from '../components/ProductCard';
 import ScrollReveal from '../components/ScrollReveal';
 import CatalogSidebar from '../components/CatalogSidebar';
 import CategoryShowcaseBar from '../components/CategoryShowcaseBar';
+import { useQuery } from '@tanstack/react-query';
 
 const SORT_OPTIONS = [
   { value: 'relevance', label: 'Best matches' },
@@ -25,8 +26,17 @@ export default function Catalog() {
   const maxPriceParam = searchParams.get('maxPrice');
 
   const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+const [error, setError] = useState('');
+
+const { data: fetchedProducts, isLoading: loading, isError } = useQuery({
+  queryKey: searchQuery ? ['products', 'search', searchQuery] : ['products'],
+  queryFn: () =>
+    (searchQuery
+      ? api.get('/api/products/search', { params: { name: searchQuery } })
+      : api.get('/api/products')
+    ).then((res) => res.data),
+  staleTime: 5 * 60 * 1000, // 5 min tak cache se hi milega, dobara API call nahi hogi
+});
 
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
@@ -37,34 +47,31 @@ export default function Catalog() {
   const [sortBy, setSortBy] = useState('relevance');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    setError('');
-    const request = searchQuery
-      ? api.get('/api/products/search', { params: { name: searchQuery } })
-      : api.get('/api/products');
+ useEffect(() => {
+  if (isError) {
+    setError('Could not load products. Is the backend running?');
+    return;
+  }
+  setError('');
 
-    request
-      .then((res) => {
-        setAllProducts(res.data);
-        if (res.data.length > 0) {
-          const prices = res.data.map((p) => p.price);
-          const bounds = { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) };
-          setPriceRange({
-            min: minPriceParam ? Math.max(bounds.min, Number(minPriceParam)) : bounds.min,
-            max: maxPriceParam ? Math.min(bounds.max, Number(maxPriceParam)) : bounds.max,
-          });
-        }
-        setSelectedCategory(categoryParam || '');
-        setSelectedBrand(brandParam || '');
-        setSelectedColor('');
-        setSelectedRating(null);
-        setInStockOnly(false);
-        setSortBy('relevance');
-      })
-      .catch(() => setError('Could not load products. Is the backend running?'))
-      .finally(() => setLoading(false));
-  }, [searchQuery, categoryParam, brandParam, minPriceParam, maxPriceParam]);
+  if (fetchedProducts) {
+    setAllProducts(fetchedProducts);
+    if (fetchedProducts.length > 0) {
+      const prices = fetchedProducts.map((p) => p.price);
+      const bounds = { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) };
+      setPriceRange({
+        min: minPriceParam ? Math.max(bounds.min, Number(minPriceParam)) : bounds.min,
+        max: maxPriceParam ? Math.min(bounds.max, Number(maxPriceParam)) : bounds.max,
+      });
+    }
+    setSelectedCategory(categoryParam || '');
+    setSelectedBrand(brandParam || '');
+    setSelectedColor('');
+    setSelectedRating(null);
+    setInStockOnly(false);
+    setSortBy('relevance');
+  }
+}, [fetchedProducts, isError, categoryParam, brandParam, minPriceParam, maxPriceParam]);
 
   const priceBounds = useMemo(() => {
     if (allProducts.length === 0) return { min: 0, max: 0 };
