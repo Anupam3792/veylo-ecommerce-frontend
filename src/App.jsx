@@ -24,6 +24,7 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminUsers from './pages/admin/AdminUsers';
 import { useEffect } from 'react';
 import { NotificationProvider } from './context/NotificationContext';
+import { useEffect, useRef } from 'react';
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
@@ -32,13 +33,21 @@ const pageVariants = {
 };
 
 function PageWrapper({ children }) {
+  const ref = useRef(null);
+
   return (
     <motion.div
+      ref={ref}
       variants={pageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      onAnimationComplete={(definition) => {
+        if (definition === 'animate' && ref.current) {
+          ref.current.style.transform = 'none';
+        }
+      }}
     >
       {children}
     </motion.div>
