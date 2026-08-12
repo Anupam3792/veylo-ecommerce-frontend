@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import CouponModal from '../components/CouponModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 function extractErrorMessage(err) {
   const data = err?.response?.data;
@@ -19,6 +20,7 @@ export default function Checkout() {
   const { items, subtotal, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [form, setForm] = useState({
     shippingName: '',
@@ -59,6 +61,7 @@ export default function Checkout() {
     });
     setSuccess(true);
     clearCart();
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
     setTimeout(() => navigate('/orders'), 1600);
   };
 

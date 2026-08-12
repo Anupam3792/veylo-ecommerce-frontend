@@ -5,7 +5,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ScrollReveal from '../components/ScrollReveal';
 import OrderTimeline from '../components/OrderTimeline';
-
+import { useQuery } from '@tanstack/react-query';
 const statusColor = {
   PENDING: 'text-ember bg-ember/10',
   CONFIRMED: 'text-verdant bg-verdant/10',
@@ -16,30 +16,14 @@ const statusColor = {
 export default function Orders() {
   const { user, loading: authLoading } = useAuth();
 
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+const { data: orders = [], isLoading: loading, isError } = useQuery({
+  queryKey: ['orders', user?.id],
+  queryFn: () => api.get(`/api/orders/user/${user.id}`).then((res) => res.data),
+  enabled: !authLoading && !!user,
+  staleTime: 2 * 60 * 1000, // 2 min — orders thodi jaldi refresh honi chahiye products se
+});
 
-  useEffect(() => {
-    if (authLoading) return;
-
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    api
-      .get(`/api/orders/user/${user.id}`)
-      .then((res) => {
-        setOrders(res.data);
-      })
-      .catch(() => {
-        setError('Could not load your orders.');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [user, authLoading]);
+const error = isError ? 'Could not load your orders.' : '';
 
   // User is not logged in
   if (!authLoading && !user) {
