@@ -9,6 +9,7 @@ import {
 import api from '../services/api';
 import ScrollReveal from '../components/ScrollReveal';
 import ProductCard from '../components/ProductCard';
+import { useQuery } from '@tanstack/react-query';
 
 const MotionLink = motion(Link);
 
@@ -634,8 +635,11 @@ function NewsletterSection() {
 }
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: products = [], isLoading: loading } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => api.get('/api/products').then((res) => res.data),
+    staleTime: 5 * 60 * 1000,
+  });
   const [copied, setCopied] = useState(false);
 
   const offerEndsAt = useMemo(() => {
@@ -644,10 +648,6 @@ export default function Home() {
     return d.getTime();
   }, []);
   const countdown = useCountdown(offerEndsAt);
-
-  useEffect(() => {
-    api.get('/api/products').then((res) => setProducts(res.data)).catch(() => {}).finally(() => setLoading(false));
-  }, []);
 
   const categories = useMemo(() => {
     const map = {};
