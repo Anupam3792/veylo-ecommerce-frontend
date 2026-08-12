@@ -1,24 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Shield, User as UserIcon } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 export default function AdminUsers() {
   const { user: currentUser } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [updatingId, setUpdatingId] = useState(null);
   const [error, setError] = useState('');
 
-  const loadUsers = () => {
-    setLoading(true);
-    api.get('/api/users/admin/all')
-      .then((res) => setUsers(res.data))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => { loadUsers(); }, []);
+  const { data: users = [], isLoading: loading } = useQuery({
+    queryKey: ['users', 'admin'],
+    queryFn: () => api.get('/api/users/admin/all').then((res) => res.data),
+    staleTime: 5 * 60 * 1000,
+  });
 
   const handleToggleAdmin = async (targetUser) => {
     const isAdmin = targetUser.roles.includes('ADMIN');
@@ -26,7 +23,9 @@ export default function AdminUsers() {
     setUpdatingId(targetUser.id);
     try {
       const res = await api.put(`/api/users/admin/${targetUser.id}/role`, { makeAdmin: !isAdmin });
-      setUsers((prev) => prev.map((u) => (u.id === targetUser.id ? res.data : u)));
+      queryClient.setQueryData(['users', 'admin'], (prev = []) =>
+  prev.map((u) => (u.id === targetUser.id ? res.data : u))
+);
     } catch (err) {
       const data = err?.response?.data;
       setError(typeof data?.message === 'string' ? data.message : 'Could not update role.');

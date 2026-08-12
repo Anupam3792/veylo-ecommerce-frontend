@@ -1,39 +1,23 @@
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Package, ShoppingCart, TrendingUp, Clock } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import api from '../../services/api';
 
 export default function AdminDashboard() {
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+const { data: products = [], isLoading: productsLoading, isError: productsError } = useQuery({
+  queryKey: ['products'],
+  queryFn: () => api.get('/api/products').then((res) => (Array.isArray(res.data) ? res.data : [])),
+  staleTime: 5 * 60 * 1000,
+});
 
-  useEffect(() => {
-    const loadDashboard = async () => {
-      setLoading(true);
-      setError('');
+const { data: orders = [], isLoading: ordersLoading, isError: ordersError } = useQuery({
+  queryKey: ['orders', 'admin'],
+  queryFn: () => api.get('/api/orders').then((res) => (Array.isArray(res.data) ? res.data : [])),
+  staleTime: 2 * 60 * 1000,
+});
 
-      try {
-        const [productsRes, ordersRes] = await Promise.all([
-          api.get('/api/products'),
-          api.get('/api/orders'),
-        ]);
-
-        setProducts(Array.isArray(productsRes.data) ? productsRes.data : []);
-        setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : []);
-      } catch (err) {
-        console.error('Admin dashboard loading error:', err);
-        setError('Could not load dashboard data.');
-        setProducts([]);
-        setOrders([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDashboard();
-  }, []);
+const loading = productsLoading || ordersLoading;
+const error = (productsError || ordersError) ? 'Could not load dashboard data.' : '';
 
   const revenue = orders.reduce(
     (sum, order) => sum + Number(order.totalAmount || 0),

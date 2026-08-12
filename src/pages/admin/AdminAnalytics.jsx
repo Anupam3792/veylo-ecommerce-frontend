@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { TrendingUp, Package, DollarSign, Star, AlertTriangle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import api from '../../services/api';
 
 const COLORS = ['#0f6e4f', '#16a06f', '#c97a2b', '#e0954a', '#14181f', '#1f242c'];
@@ -26,19 +27,19 @@ function StatCard({ icon: Icon, label, value, sub, delay = 0 }) {
 }
 
 export default function AdminAnalytics() {
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ['products', 'admin'],
+    queryFn: () => api.get('/api/products/admin/all').then((res) => res.data),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    Promise.all([
-      api.get('/api/products/admin/all'),
-      api.get('/api/orders'),
-    ]).then(([p, o]) => {
-      setProducts(p.data);
-      setOrders(o.data);
-    }).finally(() => setLoading(false));
-  }, []);
+  const { data: orders = [], isLoading: ordersLoading } = useQuery({
+    queryKey: ['orders', 'admin'],
+    queryFn: () => api.get('/api/orders').then((res) => res.data),
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const loading = productsLoading || ordersLoading;
 
   const revenue = useMemo(
   () =>

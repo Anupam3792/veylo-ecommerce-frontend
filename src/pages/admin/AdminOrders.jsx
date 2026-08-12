@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
 
 const STATUSES = [
@@ -18,67 +18,41 @@ const statusColor = {
 };
 
 export default function AdminOrders() {
-  const location = useLocation();
+  const queryClient = useQueryClient();
 
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [error, setError] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
-  const loadOrders = async () => {
-    setLoading(true);
-    setError('');
+  const { data: orders = [], isLoading: loading, refetch } = useQuery({
+    queryKey: ['orders', 'admin'],
+    queryFn: () => api.get('/api/orders').then((res) => (Array.isArray(res.data) ? res.data : [])),
+    staleTime: 2 * 60 * 1000,
+  });
 
-    try {
-      const res = await api.get('/api/orders');
 
-      setOrders(
-        Array.isArray(res.data)
-          ? res.data
-          : []
-      );
-    } catch (err) {
-      console.error('Admin orders loading error:', err);
-      setError('Could not load orders.');
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handleStatusChange = async (orderId, status) => {
+  setUpdatingId(orderId);
+  setError('');
 
-  // Initial load + reload whenever this page is opened
-  useEffect(() => {
-    loadOrders();
-  }, [location.pathname]);
+  try {
+    await api.put(
+      `/api/orders/${orderId}/status`,
+      {},
+      { params: { status } }
+    );
 
-  const handleStatusChange = async (orderId, status) => {
-    setUpdatingId(orderId);
-    setError('');
-
-    try {
-      await api.put(
-        `/api/orders/${orderId}/status`,
-        {},
-        {
-          params: { status },
-        }
-      );
-
-      setOrders((prev) =>
-        prev.map((order) =>
-          order.id === orderId
-            ? { ...order, status }
-            : order
-        )
-      );
-    } catch (err) {
-      console.error('Order status update error:', err);
-      setError('Could not update order status.');
-    } finally {
-      setUpdatingId(null);
-    }
-  };
+    queryClient.setQueryData(['orders', 'admin'], (prev = []) =>
+      prev.map((order) => (order.id === orderId ? { ...order, status } : order))
+    );
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
+  } catch (err) {
+    console.error('Order status update error:', err);
+    setError('Could not update order status.');
+  } finally {
+    setUpdatingId(null);
+  }
+};
 
   const formatAmount = (amount) => {
     return Number(amount || 0).toFixed(2);
@@ -92,9 +66,9 @@ export default function AdminOrders() {
         </h1>
 
         <button
-          type="button"
-          onClick={loadOrders}
-          disabled={loading}
+  type="button"
+  onClick={() => refetch()}
+  disabled={loading}
           className="text-xs font-mono uppercase tracking-widest text-verdant hover:text-verdant-light transition-colors disabled:opacity-40"
         >
           {loading ? 'Loading...' : 'Refresh'}

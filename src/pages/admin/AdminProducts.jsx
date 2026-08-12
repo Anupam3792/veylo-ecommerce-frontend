@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Pencil, Trash2, RotateCcw, X, Package, Tag, Truck, Star, ListChecks, Images, Ruler, Palette } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
 
 const emptyForm = {
@@ -10,20 +11,20 @@ const emptyForm = {
 };
 
 export default function AdminProducts() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const loadProducts = () => {
-    setLoading(true);
-    api.get('/api/products/admin/all').then((res) => setProducts(res.data)).finally(() => setLoading(false));
-  };
+  const { data: products = [], isLoading: loading } = useQuery({
+    queryKey: ['products', 'admin'],
+    queryFn: () => api.get('/api/products/admin/all').then((res) => res.data),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => { loadProducts(); }, []);
+  const refreshProducts = () => queryClient.invalidateQueries({ queryKey: ['products'] });
 
   const openAdd = () => {
     setEditingId(null);
@@ -89,7 +90,7 @@ export default function AdminProducts() {
         await api.post('/api/products', payload);
       }
       setModalOpen(false);
-      loadProducts();
+      refreshProducts();
     } catch (err) {
       const data = err?.response?.data;
       const msg = typeof data?.message === 'object' ? Object.values(data.message).join(' ') : (data?.message || 'Failed to save product.');
@@ -102,12 +103,12 @@ export default function AdminProducts() {
   const handleDeactivate = async (id) => {
     if (!window.confirm('Remove this product from the store? It will be hidden from customers but its order history stays intact.')) return;
     await api.delete(`/api/products/${id}`);
-    loadProducts();
+    refreshProducts();
   };
 
   const handleRestore = async (id) => {
     await api.put(`/api/products/${id}/restore`);
-    loadProducts();
+    refreshProducts();
   };
 
   const inputClass = "w-full px-4 py-2.5 rounded-lg border border-stone bg-white focus:outline-none focus:ring-2 focus:ring-verdant/40 focus:border-verdant transition-all text-sm";
