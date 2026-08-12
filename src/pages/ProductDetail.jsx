@@ -13,6 +13,7 @@ import ScrollReveal from '../components/ScrollReveal';
 import ZoomImage from '../components/ZoomImage';
 import ImageGallery from '../components/ImageGallery';
 import ReviewSection from '../components/ReviewSection';
+import { useQuery } from '@tanstack/react-query';
 const RECENTLY_VIEWED_KEY = 'veylo_recently_viewed';
 const MAX_RECENTLY_VIEWED = 20;
 
@@ -40,9 +41,14 @@ export default function ProductDetail() {
   const { isWishlisted, toggleWishlist } = useWishlist();
 
   const [product, setProduct] = useState(null);
-  const [related, setRelated] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+const [related, setRelated] = useState([]);
+const [error, setError] = useState('');
+
+const { data: productData, isLoading: loading, isError } = useQuery({
+  queryKey: ['product', id],
+  queryFn: () => api.get(`/api/products/${id}`).then((res) => res.data),
+  staleTime: 5 * 60 * 1000,
+});
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -51,37 +57,37 @@ export default function ProductDetail() {
   const [showToast, setShowToast] = useState(false);
   const [orderCountdown, setOrderCountdown] = useState('');
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError('');
-      setQuantity(1);
-      setSelectedSize(null);
-      setSizeError(false);
-      setAdded(false);
-      try {
-        const res = await api.get(`/api/products/${id}`);
-        if (cancelled) return;
-        setProduct(res.data);
-         recordRecentlyViewed(res.data.id);
+ useEffect(() => {
+  setQuantity(1);
+  setSelectedSize(null);
+  setSizeError(false);
+  setAdded(false);
+}, [id]);
 
-        const allRes = await api.get('/api/products');
-        if (cancelled) return;
-       const others = allRes.data
-          .filter((p) => p.category === res.data.category && p.id !== res.data.id);
-        setRelated(others);
-      } catch {
-        if (!cancelled) setError('Product not found.');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+useEffect(() => {
+  let cancelled = false;
+  if (isError) {
+    setError('Product not found.');
+    return;
+  }
+  if (productData) {
+    setProduct(productData);
+    recordRecentlyViewed(productData.id);
+    setError('');
+
+    api.get('/api/products').then((allRes) => {
+      if (cancelled) return;
+      const others = allRes.data.filter(
+        (p) => p.category === productData.category && p.id !== productData.id
+      );
+      setRelated(others);
+    });
+  }
+  return () => {
+    cancelled = true;
+  };
+}, [productData, isError]);
+
     useEffect(() => {
 
     function updateCountdown() {
